@@ -1,4 +1,4 @@
-import type { Order } from '../types';
+import type { Order, OrderStatus } from '../types';
 
 const BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
 
@@ -34,3 +34,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const fetchOrders = () => request<Order[]>('/orders');
 
 export const fetchOrder = (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`);
+
+export const updateOrderStatus = (id: string, status: OrderStatus) =>
+  request<Order>(`/orders/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  });

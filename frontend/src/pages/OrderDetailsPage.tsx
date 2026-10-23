@@ -1,15 +1,35 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ApiError, fetchOrder } from '../api/orders';
+import { ApiError, fetchOrder, updateOrderStatus } from '../api/orders';
 import { ErrorMessage, Loading } from '../components/Feedback';
+import { StatusActions } from '../components/StatusActions';
 import { StatusBadge } from '../components/StatusBadge';
 import { useFetch } from '../hooks/useFetch';
 import { formatDate, formatMoney } from '../lib/format';
 import { lineTotal } from '../lib/orders';
+import type { OrderStatus } from '../types';
 import { NotFoundPage } from './NotFoundPage';
 
 export function OrderDetailsPage() {
   const { id = '' } = useParams();
-  const { data: order, loading, error, retry } = useFetch(() => fetchOrder(id), [id]);
+  const { data: order, loading, error, retry, setData } = useFetch(() => fetchOrder(id), [id]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  async function changeStatus(next: OrderStatus) {
+    if (next === 'Cancelled' && !window.confirm(`Cancel order ${id}? This cannot be undone.`)) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const updated = await updateOrderStatus(id, next);
+      setData(updated);
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Update failed');
+      if (e instanceof ApiError && e.status === 400) retry();
+    } finally {
+      setSaving(false);
+    }
+  }
 
   if (loading) return <Loading label="Loading order" />;
 
@@ -71,6 +91,24 @@ export function OrderDetailsPage() {
             </tfoot>
           </table>
         </div>
+      )}
+
+      <h2>Update status</h2>
+      <StatusActions
+        status={order.status}
+        transitions={order.allowedTransitions ?? []}
+        busy={saving}
+        onChange={changeStatus}
+      />
+      {saving && (
+        <p className="muted" role="status">
+          Saving…
+        </p>
+      )}
+      {saveError && (
+        <p className="error-text" role="alert">
+          {saveError}
+        </p>
       )}
     </section>
   );

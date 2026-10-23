@@ -252,3 +252,26 @@ tfoot td {
 .table-scroll {
   overflow-x: auto;
 }
+
+/* Status actions */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.error-text {
+  color: var(--danger);
+}
