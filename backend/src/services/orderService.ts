@@ -1,9 +1,6 @@
-import { readFileSync } from 'node:fs';
-import type { Order, OrderStatus } from '../types';
 import { badRequest, notFound } from '../errors';
-
-const SEED_FILE = new URL('../data/orders.json', import.meta.url);
-const orders: Order[] = JSON.parse(readFileSync(SEED_FILE, 'utf-8'));
+import { orderRepository } from '../repositories/orderRepository';
+import type { Order, OrderStatus } from '../types';
 
 export const ALLOWED_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
   Pending: ['Processing', 'Cancelled'],
@@ -22,12 +19,13 @@ const toResponse = (order: Order): OrderResponse => ({
 });
 
 function findOrThrow(id: string): Order {
-  const order = orders.find((o) => o.id === id);
+  const order = orderRepository.findById(id);
   if (!order) throw notFound(`Order ${id} not found`);
   return order;
 }
+
 export function listOrders(): OrderResponse[] {
-  return orders.map(toResponse);
+  return orderRepository.findAll().map(toResponse);
 }
 
 export function getOrder(id: string): OrderResponse {
@@ -45,6 +43,5 @@ export function updateStatus(id: string, nextStatus: OrderStatus): OrderResponse
     throw badRequest(`Cannot change order ${id} from ${order.status} to ${nextStatus}`);
   }
 
-  order.status = nextStatus;
-  return toResponse(order);
+  return toResponse(orderRepository.updateStatus(id, nextStatus)!);
 }
