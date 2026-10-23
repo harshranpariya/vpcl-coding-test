@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { formatDate, formatMoney } from '../lib/format';
 import type { Order } from '../types';
 import { StatusBadge } from './StatusBadge';
@@ -12,6 +13,7 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
           <th>Date</th>
           <th>Status</th>
           <th className="num">Total</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -24,6 +26,11 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
               <StatusBadge status={order.status} />
             </td>
             <td className="num">{formatMoney(order.total)}</td>
+            <td>
+              <Link className="btn btn-small" to={`/orders/${encodeURIComponent(order.id)}`}>
+                View
+              </Link>
+            </td>
           </tr>
         ))}
       </tbody>

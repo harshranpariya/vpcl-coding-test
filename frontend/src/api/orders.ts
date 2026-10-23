@@ -32,3 +32,5 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const fetchOrders = () => request<Order[]>('/orders');
+
+export const fetchOrder = (id: string) => request<Order>(`/orders/${encodeURIComponent(id)}`);

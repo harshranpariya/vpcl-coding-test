@@ -223,3 +223,32 @@ tfoot td {
   outline: 2px solid var(--primary);
   outline-offset: 1px;
 }
+
+
+/* Order details */
+.back-link {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.details-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.btn-small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}

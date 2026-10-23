@@ -1,4 +1,4 @@
-import type { Order, OrderStatus } from '../types';
+import type { Order, OrderItem, OrderStatus } from '../types';
 
 export type StatusFilter = OrderStatus | 'All';
 
@@ -12,3 +12,5 @@ export function filterOrders(orders: Order[], search: string, status: StatusFilt
         order.customerName.toLowerCase().includes(term)),
   );
 }
+
+export const lineTotal = (item: OrderItem): number => item.quantity * item.unitPrice;
