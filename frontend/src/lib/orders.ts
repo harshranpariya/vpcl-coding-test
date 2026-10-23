@@ -2,6 +2,13 @@ import type { Order, OrderItem, OrderStatus } from '../types';
 
 export type StatusFilter = OrderStatus | 'All';
 
+export type SortKey = 'orderDate' | 'total';
+
+export interface SortState {
+  key: SortKey;
+  direction: 'asc' | 'desc';
+}
+
 export function filterOrders(orders: Order[], search: string, status: StatusFilter): Order[] {
   const term = search.trim().toLowerCase();
   return orders.filter(
@@ -11,6 +18,14 @@ export function filterOrders(orders: Order[], search: string, status: StatusFilt
         order.id.toLowerCase().includes(term) ||
         order.customerName.toLowerCase().includes(term)),
   );
+}
+
+export function sortOrders(orders: Order[], { key, direction }: SortState): Order[] {
+  const sign = direction === 'asc' ? 1 : -1;
+  return [...orders].sort((a, b) => {
+    const diff = key === 'total' ? a.total - b.total : a.orderDate.localeCompare(b.orderDate);
+    return diff * sign;
+  });
 }
 
 export function summarize(orders: Order[]): Record<StatusFilter, number> {
