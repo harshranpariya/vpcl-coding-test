@@ -80,3 +80,108 @@ h2 {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  background: #f9fafb;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+tfoot th,
+tfoot td {
+  font-weight: 700;
+  background: #f9fafb;
+  border-bottom: 0;
+}
+
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-pending { color: var(--pending); background: var(--pending-bg); }
+.badge-processing { color: var(--processing); background: var(--processing-bg); }
+.badge-completed { color: var(--completed); background: var(--completed-bg); }
+.badge-cancelled { color: var(--cancelled); background: var(--cancelled-bg); }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  border-color: var(--primary);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading, error and empty states */
+.feedback {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+.feedback-error {
+  border-color: var(--danger);
+  color: var(--text);
+}
+
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.4rem;
+  vertical-align: -0.15em;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
