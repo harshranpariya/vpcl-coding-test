@@ -321,3 +321,62 @@ tfoot td {
 .card-processing .card-value { color: var(--processing); }
 .card-completed .card-value { color: var(--completed); }
 .card-cancelled .card-value { color: var(--cancelled); }
+
+/* Accessibility helpers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.btn:focus-visible,
+.card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* Mobile: the order list becomes a stack of cards */
+@media (max-width: 700px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .orders thead {
+    display: none;
+  }
+
+  .orders,
+  .orders tbody,
+  .orders tr,
+  .orders td {
+    display: block;
+    width: 100%;
+  }
+
+  .orders tr {
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 0;
+  }
+
+  .orders td {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0.9rem;
+    border: 0;
+    text-align: right;
+  }
+
+  .orders td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  .orders td:last-child {
+    justify-content: flex-end;
+  }
+}

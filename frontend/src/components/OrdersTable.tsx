@@ -13,19 +13,23 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
           <th>Date</th>
           <th>Status</th>
           <th className="num">Total</th>
-          <th></th>
+          <th>
+            <span className="sr-only">Actions</span>
+          </th>
         </tr>
       </thead>
       <tbody>
         {orders.map((order) => (
           <tr key={order.id}>
-            <td>{order.id}</td>
-            <td>{order.customerName}</td>
-            <td>{formatDate(order.orderDate)}</td>
-            <td>
+            <td data-label="Order ID">{order.id}</td>
+            <td data-label="Customer">{order.customerName}</td>
+            <td data-label="Date">{formatDate(order.orderDate)}</td>
+            <td data-label="Status">
               <StatusBadge status={order.status} />
             </td>
-            <td className="num">{formatMoney(order.total)}</td>
+            <td data-label="Total" className="num">
+              {formatMoney(order.total)}
+            </td>
             <td>
               <Link className="btn btn-small" to={`/orders/${encodeURIComponent(order.id)}`}>
                 View
