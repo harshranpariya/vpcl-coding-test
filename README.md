@@ -4,13 +4,14 @@ A small full-stack app for viewing, searching, filtering and updating customer o
 
 - Frontend: React 19, TypeScript, Vite, React Router. Plain CSS, no component library.
 - Backend: Node.js, Express 5, TypeScript. Orders live in memory, seeded from a JSON file. No database.
-- Tests: Vitest on both sides, Supertest for the HTTP layer, React Testing Library for the component test.
+- Tests: Vitest on both sides, Supertest for the HTTP layer, React Testing Library for the component tests.
 
 ## Project structure
 
 ```
 ├── .nvmrc                             # Node.js version
 ├── package.json                       # npm workspaces and root scripts
+├── eslint.config.mjs                  # ESLint: recommended TypeScript and React Hooks rules
 ├── backend/
 │   ├── src/
 │   │   ├── index.ts                   # starts the HTTP server
@@ -37,7 +38,8 @@ A small full-stack app for viewing, searching, filtering and updating customer o
         │   ├── OrdersTable.tsx        # order list with View links, stacks into cards on mobile
         │   ├── StatusBadge.tsx        # status pill
         │   ├── StatusActions.tsx      # buttons for the allowed transitions (component test alongside)
-        │   └── Feedback.tsx           # loading, error and empty states
+        │   ├── Feedback.tsx           # loading, error and empty states
+        │   └── ErrorBoundary.tsx      # message and reload link if a component throws while rendering (test alongside)
         ├── hooks/useFetch.ts          # loading / error / data for any async loader
         ├── api/orders.ts              # the only place that calls fetch
         ├── lib/orders.ts              # pure filter / sort / summary functions (unit tests alongside)
@@ -69,11 +71,12 @@ npm run dev:frontend
 
 The frontend reads the API base URL from `VITE_API_URL` and defaults to `http://localhost:3001`. Copy `frontend/.env.example` to `frontend/.env` to change it. The backend port can be changed with the `PORT` environment variable.
 
-Run all automated tests, or type-check both apps, from the repository root:
+Run all automated tests, type-check both apps, or lint everything, from the repository root:
 
 ```bash
 npm test
 npm run typecheck
+npm run lint
 ```
 
 Each app can also be run on its own from inside its folder with `npm run dev` and `npm test`. The frontend also has `npm run build` for a production bundle.
@@ -153,7 +156,7 @@ No optimistic updates. A status change sends a PATCH request, and the screen onl
 
 State management. Each page keeps its own state, and one small `useFetch` hook does the loading. The hook tracks loading, error and data, ignores a response that arrives after the user has moved to another page, and offers `retry` and `setData`. The dashboard fetches again when you come back to it, so the list and the cards always show the latest backend state. A global store or TanStack Query would be the next step if more pages needed to share data.
 
-Consistent feedback. Every page has clear loading, error (with a retry button), empty and not-found states. Status is shown as a coloured badge with its text, so colour is never the only signal.
+Consistent feedback. Every page has clear loading, error (with a retry button), empty and not-found states. Status is shown as a coloured badge with its text, so colour is never the only signal. A root error boundary shows a message and a reload link if a component throws while rendering, instead of a blank page.
 
 Responsive layout. Below 700px the order table becomes a stack of cards, done with CSS only. Each cell gets its label from a `data-label` attribute. The items table on the details page scrolls sideways on narrow screens. Buttons and cards show a visible focus ring for keyboard users.
 
@@ -177,7 +180,7 @@ Priority 2
 - Summary cards for total, pending, processing, completed and cancelled orders; each card also acts as a filter
 - Sorting by order date or total, ascending or descending, applied on top of search and filter
 - Responsive layout for desktop and mobile, keyboard-accessible controls with visible focus
-- Automated tests: 14 backend (service rules, seed integrity, HTTP endpoints) and 8 frontend (filter, sort, summary, status action buttons)
+- Automated tests: 14 backend (service rules, seed integrity, HTTP endpoints) and 10 frontend (filter, sort, summary, status action buttons, error boundary)
 - Backend split into routes, service and repository, with structured error responses and payload validation
 
 ## Assumptions and limitations

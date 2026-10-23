@@ -12,6 +12,7 @@ export function useFetch<T>(load: () => Promise<T>, deps: unknown[]) {
 
   useEffect(() => {
     let cancelled = false; // ignore a result that lands after deps changed or the page unmounted
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({ data: null, error: null, loading: true });
     load().then(
       (data) => {
@@ -24,6 +25,7 @@ export function useFetch<T>(load: () => Promise<T>, deps: unknown[]) {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, attempt]);
 
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
