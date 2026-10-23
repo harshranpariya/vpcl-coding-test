@@ -3,8 +3,9 @@ import { fetchOrders } from '../api/orders';
 import { EmptyState, ErrorMessage, Loading } from '../components/Feedback';
 import { OrderFilters } from '../components/OrderFilters';
 import { OrdersTable } from '../components/OrdersTable';
+import { SummaryCards } from '../components/SummaryCards';
 import { useFetch } from '../hooks/useFetch';
-import { filterOrders, type StatusFilter } from '../lib/orders';
+import { filterOrders, summarize, type StatusFilter } from '../lib/orders';
 
 export function DashboardPage() {
   const { data: orders, loading, error, retry } = useFetch(fetchOrders, []);
@@ -25,6 +26,7 @@ export function DashboardPage() {
   return (
     <>
       <h1 className="page-title">Orders</h1>
+      <SummaryCards counts={summarize(orders)} active={status} onSelect={setStatus} />
       <OrderFilters search={search} status={status} onSearchChange={setSearch} onStatusChange={setStatus} />
       {visible.length === 0 ? (
         <EmptyState message="No orders match your search." actionLabel="Clear filters" onAction={clearFilters} />
