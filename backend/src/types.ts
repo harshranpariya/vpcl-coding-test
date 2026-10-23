@@ -17,3 +17,7 @@ export interface Order {
   total: number;
   items: OrderItem[];
 }
+
+export function isOrderStatus(value: unknown): value is OrderStatus {
+  return typeof value === 'string' && (ORDER_STATUSES as readonly string[]).includes(value);
+}
