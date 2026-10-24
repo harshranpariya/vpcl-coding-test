@@ -1,5 +1,8 @@
+import { SearchIcon } from 'lucide-react';
 import type { SortState, StatusFilter } from '../lib/orders';
 import { ORDER_STATUSES } from '../types';
+import { Input } from './ui/input';
+import { NativeSelect, NativeSelectOption } from './ui/native-select';
 
 const SORT_OPTIONS: { label: string; sort: SortState }[] = [
   { label: 'Newest first', sort: { key: 'orderDate', direction: 'desc' } },
@@ -21,32 +24,40 @@ interface Props {
 
 export function OrderFilters({ search, status, sort, onSearchChange, onStatusChange, onSortChange }: Props) {
   return (
-    <div className="filters">
-      <label className="field field-grow">
-        <span>Search</span>
-        <input
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="relative flex-1">
+        <SearchIcon
+          className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <Input
           type="search"
-          placeholder="Order ID or customer name"
+          aria-label="Search orders"
+          placeholder="Search by order ID or customer name"
+          className="pl-8"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
-      </label>
+      </div>
 
-      <label className="field">
-        <span>Status</span>
-        <select value={status} onChange={(e) => onStatusChange(e.target.value as StatusFilter)}>
-          <option value="All">All statuses</option>
+      <div className="grid grid-cols-2 gap-3 sm:flex">
+        <NativeSelect
+          className="w-full sm:w-40"
+          aria-label="Filter by status"
+          value={status}
+          onChange={(e) => onStatusChange(e.target.value as StatusFilter)}
+        >
+          <NativeSelectOption value="All">All statuses</NativeSelectOption>
           {ORDER_STATUSES.map((s) => (
-            <option key={s} value={s}>
+            <NativeSelectOption key={s} value={s}>
               {s}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
-      </label>
+        </NativeSelect>
 
-      <label className="field">
-        <span>Sort by</span>
-        <select
+        <NativeSelect
+          className="w-full sm:w-40"
+          aria-label="Sort orders"
           value={sortValue(sort)}
           onChange={(e) => {
             const option = SORT_OPTIONS.find((o) => sortValue(o.sort) === e.target.value);
@@ -54,12 +65,12 @@ export function OrderFilters({ search, status, sort, onSearchChange, onStatusCha
           }}
         >
           {SORT_OPTIONS.map((o) => (
-            <option key={sortValue(o.sort)} value={sortValue(o.sort)}>
+            <NativeSelectOption key={sortValue(o.sort)} value={sortValue(o.sort)}>
               {o.label}
-            </option>
+            </NativeSelectOption>
           ))}
-        </select>
-      </label>
+        </NativeSelect>
+      </div>
     </div>
   );
 }

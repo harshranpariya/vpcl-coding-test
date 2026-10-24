@@ -2,9 +2,19 @@
 
 A small full-stack app for viewing, searching, filtering and updating customer orders. 
 
-- Frontend: React 19, TypeScript, Vite, React Router. Plain CSS, no component library.
+- Frontend: React 19, TypeScript, Vite, React Router, Tailwind CSS 4 and shadcn/ui components (Radix primitives, Lucide icons, Sonner toasts).
 - Backend: Node.js, Express 5, TypeScript. Orders live in memory, seeded from a JSON file. No database.
 - Tests: Vitest on both sides, Supertest for the HTTP layer, React Testing Library for the component tests.
+
+## Screenshots
+
+Dashboard: summary cards that double as filters, search, status filter, sort and the orders table.
+
+![Dashboard page](docs/screenshots/dashboard.png)
+
+Order details: items with line totals, a summary panel and the allowed status actions.
+
+![Order details page](docs/screenshots/order-details.png)
 
 ## Project structure
 
@@ -12,6 +22,7 @@ A small full-stack app for viewing, searching, filtering and updating customer o
 ├── .nvmrc                             # Node.js version
 ├── package.json                       # npm workspaces and root scripts
 ├── eslint.config.mjs                  # ESLint: recommended TypeScript and React Hooks rules
+├── docs/screenshots/                  # the two screenshots shown above
 ├── backend/
 │   ├── src/
 │   │   ├── index.ts                   # starts the HTTP server
@@ -26,19 +37,22 @@ A small full-stack app for viewing, searching, filtering and updating customer o
 │   └── tests/                         # service rule tests and HTTP endpoint tests (Supertest)
 └── frontend/
     ├── .env.example                   # VITE_API_URL template
+    ├── components.json                # shadcn/ui settings used by its CLI
     └── src/
         ├── main.tsx, App.tsx          # entry point and routes
-        ├── index.css                  # all styles, including the mobile layout
+        ├── index.css                  # Tailwind import and the theme tokens for light and dark mode
         ├── pages/DashboardPage.tsx    # list, summary cards, search, filter, sort
         ├── pages/OrderDetailsPage.tsx # items, totals, status update
         ├── pages/NotFoundPage.tsx     # unknown routes and unknown order IDs
         ├── components/
+        │   ├── ui/                    # shadcn/ui primitives added with its CLI: button, badge, card, table, alert-dialog, ...
+        │   ├── ThemeToggle.tsx        # light / dark switch in the header
         │   ├── SummaryCards.tsx       # count per status, each card is also a filter
         │   ├── OrderFilters.tsx       # search box, status filter and sort select
-        │   ├── OrdersTable.tsx        # order list with View links, stacks into cards on mobile
-        │   ├── StatusBadge.tsx        # status pill
-        │   ├── StatusActions.tsx      # buttons for the allowed transitions (component test alongside)
-        │   ├── Feedback.tsx           # loading, error and empty states
+        │   ├── OrdersTable.tsx        # table on desktop, a list of cards on mobile
+        │   ├── StatusBadge.tsx        # status badge, the one place that maps a status to a colour
+        │   ├── StatusActions.tsx      # buttons for the allowed transitions, cancelling opens a confirmation dialog (component test alongside)
+        │   ├── Feedback.tsx           # skeleton loading, error alert and empty states
         │   └── ErrorBoundary.tsx      # message and reload link if a component throws while rendering (test alongside)
         ├── hooks/useFetch.ts          # loading / error / data for any async loader
         ├── api/orders.ts              # the only place that calls fetch
@@ -156,9 +170,11 @@ No optimistic updates. A status change sends a PATCH request, and the screen onl
 
 State management. Each page keeps its own state, and one small `useFetch` hook does the loading. The hook tracks loading, error and data, ignores a response that arrives after the user has moved to another page, and offers `retry` and `setData`. The dashboard fetches again when you come back to it, so the list and the cards always show the latest backend state. A global store or TanStack Query would be the next step if more pages needed to share data.
 
-Consistent feedback. Every page has clear loading, error (with a retry button), empty and not-found states. Status is shown as a coloured badge with its text, so colour is never the only signal. A root error boundary shows a message and a reload link if a component throws while rendering, instead of a blank page.
+Consistent feedback. Every page has clear loading (skeleton rows), error (with a retry button), empty and not-found states. Status is shown as a coloured badge with its text, so colour is never the only signal. A successful status change shows a toast, and cancelling asks for confirmation in a dialog that traps focus and closes on Escape. A root error boundary shows a message and a reload link if a component throws while rendering, instead of a blank page.
 
-Responsive layout. Below 700px the order table becomes a stack of cards, done with CSS only. Each cell gets its label from a `data-label` attribute. The items table on the details page scrolls sideways on narrow screens. Buttons and cards show a visible focus ring for keyboard users.
+Styling. Tailwind CSS 4 runs through its Vite plugin, so there is no Tailwind config file. The theme is a set of CSS variables in `index.css` with a `.dark` override. The app always starts in light mode, and the header toggle switches to dark and back; the choice is saved in `localStorage`. A small inline script in `index.html` applies a saved dark choice before React loads, so the page never flashes the wrong theme. The shadcn/ui components live in `src/components/ui` as ordinary project files added by its CLI, so they can be read and changed like any other component. Status colours are defined once, in `StatusBadge.tsx`.
+
+Responsive layout. Below the `md` breakpoint (768px) the order table is replaced by a list of cards with full-width View buttons at least 44px tall for touch. The summary cards and filters wrap on small screens, and the items table on the details page scrolls sideways if it cannot fit. Controls show a visible focus ring for keyboard users.
 
 Dates and money. `orderDate` is a date-only string such as 2026-10-15. It is formatted in UTC on purpose: parsing a date-only string gives midnight UTC, and formatting that in a North American time zone would show the previous day. Totals are formatted as CAD.
 
@@ -179,8 +195,8 @@ Priority 2
 
 - Summary cards for total, pending, processing, completed and cancelled orders; each card also acts as a filter
 - Sorting by order date or total, ascending or descending, applied on top of search and filter
-- Responsive layout for desktop and mobile, keyboard-accessible controls with visible focus
-- Automated tests: 14 backend (service rules, seed integrity, HTTP endpoints) and 10 frontend (filter, sort, summary, status action buttons, error boundary)
+- Responsive layout for desktop and mobile with Tailwind CSS and shadcn/ui, keyboard-accessible controls with visible focus, light and dark themes
+- Automated tests: 14 backend (service rules, seed integrity, HTTP endpoints) and 11 frontend (filter, sort, summary, status action buttons and the cancel confirmation, error boundary)
 - Backend split into routes, service and repository, with structured error responses and payload validation
 
 ## Assumptions and limitations
@@ -192,7 +208,7 @@ Priority 2
 - Currency is assumed to be CAD. Dates are date-only ISO strings.
 - The `Order` type is declared in both apps rather than in a shared package, to keep the two apps independently runnable. A shared types package would be the next step.
 - Search, filter and sort run on the client. Pagination and server-side querying would be needed for large datasets.
-- Cancelling asks for confirmation with the browser's native dialog.
+- Cancelling asks for confirmation in a dialog before the request is sent.
 
 ## Use of AI tools
 

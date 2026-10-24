@@ -1,4 +1,7 @@
+import { TriangleAlertIcon } from 'lucide-react';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { EmptyState } from './Feedback';
+import { Button } from './ui/button';
 
 interface State {
   error: Error | null;
@@ -18,13 +21,11 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
   render() {
     if (this.state.error) {
       return (
-        <section className="panel">
-          <h1>Something went wrong</h1>
-          <p className="muted">{this.state.error.message}</p>
-          <a href="/" className="btn">
-            Reload the dashboard
-          </a>
-        </section>
+        <EmptyState as="h1" icon={<TriangleAlertIcon />} title="Something went wrong" description={this.state.error.message}>
+          <Button asChild variant="outline">
+            <a href="/">Reload the dashboard</a>
+          </Button>
+        </EmptyState>
       );
     }
     return this.props.children;
